@@ -1,0 +1,48 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+</head>
+<body>
+    
+    <h1>Create Form</h1>
+    <h5 id="message"></h5>
+    <form id="post-form" method="POST" >
+        {% csrf_token %}
+        <p>Name:</p>
+        <input type="text" id="idname" name="name" /><br/>
+        <p>email: </p>
+        <input type="email" id="idemail" name="email" /><br/>
+        <p>Bio</p>
+        <input type="text" id="idbio" name="bio" /><br/>
+        <input type="submit" />
+    </form>
+</body>
+
+<script type="text/javascript">
+    $(document).on('submit','#post-form',function(e){
+        e.preventDefault();
+        $.ajax({
+            type:'post',
+            url:'create/',
+            data:{
+                name:$('#idname').val(),
+                email:$('#idemail').val(),
+                bio:$('#idbio').val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success:function(message){
+                $('h5').html(message);
+
+            }
+        });
+    });
+</script>
+
+</html>
