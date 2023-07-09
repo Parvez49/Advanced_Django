@@ -134,6 +134,73 @@ class StudentDetail(APIView):
 Note: The PUT and PATCH methods in HTTP are not the same.The PUT method is used to update an entire resource. When making a PUT request, you typically send the complete representation of the resource in the request payload. This means that if any fields are omitted in the payload, they will be set to their default or empty values.
 On the other hand, the PATCH method is used to partially update a resource. With a PATCH request, you only need to send the fields that you want to update in the request payload. The rest of the fields will remain unchanged.
 
+# Pagination
+REST framework includes support for customizable pagination styles. This allows you to modify how large result sets are split into individual pages of data.
+Setting the pagination style:
+```
+The pagination style may be set globally:
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
+```
+Modifying the pagination style:
+```
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 1
+    page_size_query_param = 'page_size'
+    max_page_size = 3
+
+    """ # Custom Output data format
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'count': self.page.paginator.count,
+            'results': data
+        })
+    """
+
+class StudentList(ListAPIView):
+    queryset=Students.objects.all()
+    serializer_class=StudentSerializer
+    pagination_class=StandardResultsSetPagination
+```
+
+# Simple JWT(JSON Web Token)
+https://django-rest-framework-simplejwt.readthedocs.io/en/latest/
+Simple JWT provides a JSON Web Token authentication backend for the Django REST Framework
+Simple JWT can be installed with pip:
+```
+pip install djangorestframework-simplejwt
+```
+In setting.py:
+```
+REST_FRAMEWORK = {
+    ...
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        ...
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+    ...
+}
+```
+urls.py
+```
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+```
+
+
 
 
 
